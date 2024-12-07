@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EmployeeResource\Pages;
 use App\Filament\Resources\EmployeeResource\RelationManagers;
 use App\Models\City;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\State;
 use Filament\Forms;
@@ -16,6 +17,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -35,38 +37,36 @@ class EmployeeResource extends Resource
                 
                 Forms\Components\Section::make('Relationships')
                     ->schema([
-                    Forms\Components\Select::make('country_id')
-                        ->relationship(name:'country',titleAttribute:'name')
-                        ->searchable()
-                        ->preload()    
-                        ->live()
-                        ->afterStateUpdated(function(Set $set){
-                            $set('state_id',null);
-                            $set('city_id',null);
-                        })
-                        ->required(),
-                    Forms\Components\Select::make('state_id')
-                        ->options(fn(Get $get):Collection=>State::query()
-                            ->where('country_id',$get('country_id'))
-                            ->pluck('name','id'))
+                        Forms\Components\Select::make('country_id')
+                        ->relationship(name: 'country', titleAttribute: 'name')
                         ->searchable()
                         ->preload()
                         ->live()
+                        ->afterStateUpdated(function (Set $set) {
+                            $set('state_id', null);
+                            $set('city_id', null);
+                        })
+                        ->required(),
+                    Forms\Components\Select::make('state_id')
+                        ->options(fn (Get $get): Collection => State::query()
+                            ->where('country_id', $get('country_id'))
+                            ->pluck('name', 'id'))
+                        ->searchable()
+                        ->preload()
+                        ->live()
+                        ->afterStateUpdated(fn (Set $set) => $set('city_id', null))
                         ->required(),
                     Forms\Components\Select::make('city_id')
-                        ->options(fn(Get $get):Collection=>City::query()
-                            ->where('state_id',$get('country_id'))
-                            ->pluck('name','id'))
+                        ->options(fn (Get $get): Collection => City::query()
+                            ->where('state_id', $get('state_id'))
+                            ->pluck('name', 'id'))
                         ->searchable()
-                        ->afterStateUpdated(fn(Set $set)=>$set('city_id',null))
-                        ->preload()    
-                        ->live()      
+                        ->preload()
                         ->required(),
-                    
                     Forms\Components\Select::make('department_id')
-                        ->relationship(name:'department',titleAttribute:'name')
+                        ->relationship(name: 'department', titleAttribute: 'name')
                         ->searchable()
-                        ->preload()    
+                        ->preload()
                         ->required(),
                     ])->columns(2),
                 Forms\Components\Section::make('User Name')
@@ -110,16 +110,6 @@ class EmployeeResource extends Resource
                 Tables\Columns\TextColumn::make('country.name')
                     ->searchable()
                     ->sortable(),
-                // Tables\Columns\TextColumn::make('state_id')
-                //     ->numeric()
-                //     ->sortable(),
-                // Tables\Columns\TextColumn::make('city_id')
-                //     ->numeric()
-                //     ->sortable(),
-                // Tables\Columns\TextColumn::make('department_id')
-                //     ->numeric()
-                //     ->sortable()
-                //     ->toggleable(isToggledHiddenByDefault:true),
                 Tables\Columns\TextColumn::make('first_name')
                     ->searchable()
                     ->sortable(),
@@ -149,7 +139,10 @@ class EmployeeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                
+                SelectFilter::make('Department')
+                ->relationship('department','name')
+                ->searchable()
+                ->preload(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -176,8 +169,12 @@ class EmployeeResource extends Resource
                 Section::make('Relationships')
                     ->schema([
                         TextEntry::make('country.name'),
-                        TextEntry::make('state.name'),
-                        TextEntry::make('city.name'),
+                        TextEntry::make(
+                            'state.name'
+                        ),
+                        TextEntry::make(
+                            'city.name'
+                        ),
                         TextEntry::make('department.name'),
                     ])->columns(2),
                 Section::make('Name')
