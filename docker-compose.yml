@@ -1,0 +1,50 @@
+services:
+  app:
+    #restart: always
+    build: ./docker/app
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www/
+    networks:
+      - filament-app
+  #cron:
+    #restart: always
+    #build: ./docker/cron
+    #working_dir: /var/www
+    #volumes:
+    #  - .:/var/www/
+    #networks:
+    #  - filament-app
+  web:
+    #restart: always
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/log:/var/log/nginx
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - filament-app
+  db:
+    #restart: always
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_HOST=%
+      - MYSQL_DATABASE=filament-app
+      - MYSQL_ROOT_PASSWORD=dev
+    volumes:
+      - dbfilament-app:/var/lib/mysql
+    networks:
+      - filament-app
+    ports:
+      - "3307:3306"
+
+#Docker Networks
+networks:
+  filament-app:
+    driver: bridge
+
+volumes:
+    dbfilament-app:
