@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Department;
 use Database\Seeders\CitySeeder;
 use Database\Seeders\CountrySeeder;
 use Database\Seeders\StateSeeder;
@@ -29,20 +30,23 @@ class CountrySeedCommand extends Command
      */
     public function handle()
     {
-        $this->info('Starting the Country, State, and City seeders...');
+        // Department::create([
+        //     'name'=>'Laravel'
+        // ]);
+        // $this->info('Starting the Country, State, and City seeders...');
 
-        // Country Seeder
-        Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CountrySeeder']);
-        $this->info('CountrySeeder has been executed.');
+        // // Country Seeder
+        // Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CountrySeeder']);
+        // $this->info('CountrySeeder has been executed.');
 
-        // State Seeder
-        Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\StateSeeder']);
-        $this->info('StateSeeder has been executed.');
+        // // State Seeder
+        // Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\StateSeeder']);
+        // $this->info('StateSeeder has been executed.');
 
-        // City Seeder
-        Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CitySeeder']);
-        $this->info('CitySeeder has been executed.');
+        // // City Seeder
+        // Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CitySeeder']);
+        // $this->info('CitySeeder has been executed.');
 
-        $this->info('All seeders have been executed successfully!');
+        // $this->info('All seeders have been executed successfully!');
     }
 }
