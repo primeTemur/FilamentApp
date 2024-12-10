@@ -14,9 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Department::create([
-            'name'=>'Laravel'
-        ]);
+        
 
         $this->call(CountrySeeder::class);
         $this->call(StateSeeder::class);
