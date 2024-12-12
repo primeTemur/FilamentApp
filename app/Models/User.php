@@ -23,6 +23,7 @@ class User extends Authenticatable implements HasTenants
         'name',
         'email',
         'password',
+        'is_admin'
     ];
 
 
@@ -45,12 +46,15 @@ class User extends Authenticatable implements HasTenants
         'password',
         'remember_token',
     ];
-
+    public function  isAdmin():bool{
+        return $this->email=='admin@admin.com';
+    }
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin'=>'boolean',
         ];
     }
 }
